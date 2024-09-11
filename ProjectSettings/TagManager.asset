@@ -10,6 +10,7 @@ TagManager:
   - Retry Button
   - Home Button
   - finish
+  - Dead Heart
   layers:
   - Default
   - TransparentFX

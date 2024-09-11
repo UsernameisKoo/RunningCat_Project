@@ -1,5 +1,7 @@
+using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerMove : MonoBehaviour
 {
@@ -8,19 +10,13 @@ public class PlayerMove : MonoBehaviour
     public float speed = 3.0f;
     public PlayerMove player;
     public GameManager gameManager;
-    public Rigidbody2D rigid;
+    Rigidbody2D rigid;
     SpriteRenderer spriteRenderer;
     Animator anim;
-   
-    public bool isGrounded;
- 
 
     void Start()
     {
-
         gameManager = FindObjectOfType<GameManager>();
-        rigid=GetComponent<Rigidbody2D>();
-        
     }
 
 
@@ -36,15 +32,15 @@ public class PlayerMove : MonoBehaviour
         }
     }
     void Update()
-    {  
+    {
         //Jump
-        if (Input.GetKeyDown(KeyCode.Space)&&isGrounded)//!anim.GetBool("isJumping"))
+        if (Input.GetButtonUp("Jump"))//!anim.GetBool("isJumping"))
         {
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
-            isGrounded = false;
             //anim.SetBool("isJumping", true);
- 
         }
+        rigid.velocity = new Vector2(speed, rigid.velocity.y); //rigid.velocity.y
+
     }
 
 
@@ -69,24 +65,24 @@ public class PlayerMove : MonoBehaviour
 }*/
     void FixedUpdate()
     {
-        // 키로 움직이는거 안함
+        // 
 
         //Landing Platform
-     
-            //transform.Translate(Vector3.right * speed * Time.deltaTime);
-            /*  Debug.DrawRay(rigid.position, Vector3.down*4,   new Color(0, 1, 0));
 
-              RaycastHit2D rayHit = Physics2D.Raycast(rigid.position, Vector3.down, 1, 10,  LayerMask.GetMask("Platform"));
+        //transform.Translate(Vector3.right * speed * Time.deltaTime);
+        /*  Debug.DrawRay(rigid.position, Vector3.down*4,   new Color(0, 1, 0));
 
-              if (rayHit.collider != null)
+          RaycastHit2D rayHit = Physics2D.Raycast(rigid.position, Vector3.down, 1, 10,  LayerMask.GetMask("Platform"));
+
+          if (rayHit.collider != null)
+          {
+             // if (rayHit.distance < 0.5f)
               {
-                 // if (rayHit.distance < 0.5f)
-                  {
-                     // anim.SetBool("isJumping", false);
-                  }
+                 // anim.SetBool("isJumping", false);
               }
-          }*/
-        
+          }
+      }*/
+
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -95,16 +91,12 @@ public class PlayerMove : MonoBehaviour
         {
             OnDamaged(collision.transform.position);
         }
-        if (collision.gameObject.CompareTag ("Platform"))
-        {
-            isGrounded = true;
-        }
     }
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Platform"))
         {
-            if (collision.transform.position.y < -10) // 예: 낭떠러지에 떨어졌는지 확인
+            if (collision.transform.position.y <= 0) 
             {
                 Debug.Log("Player Collision Detected");
                 gameManager.HeartDown();
@@ -118,8 +110,9 @@ public class PlayerMove : MonoBehaviour
         {
             Debug.Log("Finish Collision Detected");
             gameManager.heart = 3;
-            gameManager.Me.SetActive(false);
-            gameManager.Stages[gameManager.stageIndex].SetActive(false); // 현재 스테이지 비활성화
+            //gameManager.Me.SetActive(false);
+            //gameManager.Stages[gameManager.stageIndex].SetActive(false);
+            Time.timeScale = 0;
             gameManager.StageClear();
             Debug.Log("Game Clear");
         }
@@ -129,19 +122,16 @@ public class PlayerMove : MonoBehaviour
 
     void OnDamaged(Vector2 targetPos)
     {
-        //하트 감소
         gameManager.HeartDown();
-
-        //Change Layer(Immortal Active)
+       //Change Layer(Immortal Active)
         gameObject.layer = 11;
 
-        //View Alpha : 무적시간 투명하게
+        
+        //View Alpha 
         spriteRenderer.color = new Color(1, 1, 1, 0.4f);
-
-        // Animation
-        //anim.SetTrigger("doDamaged");
-
-        Invoke("OffDamaged", 2); // 무적시간 3초 후 푸는 함수 호출
+        
+        
+        Invoke("OffDamaged", 2); 
     }
 
     void OffDamaged()
@@ -149,6 +139,4 @@ public class PlayerMove : MonoBehaviour
         gameObject.layer = 10;
         spriteRenderer.color = new Color(1, 1, 1, 1);
     }
-
-    
 }

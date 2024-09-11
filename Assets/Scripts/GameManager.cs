@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -19,10 +20,10 @@ public class GameManager : MonoBehaviour
 
     public void HeartDown()
     {
-        if (heart > 0)
+        if (heart > 0 && Me.layer == 10)
         {
             heart--;
-            Hearts[2 - heart].SetActive(false);
+            Hearts[heart].SetActive(false);
 
             // 죽음 -> 홈으로 돌아감
             if (heart == 0)
